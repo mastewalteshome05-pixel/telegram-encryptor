@@ -106,7 +106,7 @@ TEXTS = {
         'room_connected': "🔒 ከክፍሉ ጋር ተገናኝተዋል! መልእክቶች እና ፋይሎች በሙሉ የተጠበቁ ናቸው።",
         'room_left': "🚪 ከክፍሉ ወጥተዋል።", 'not_in_room': "እርስዎ በማንኛውም ክፍል ውስጥ የሉዎትም።",
         'ask_room_pass': "ለሚፈጥሩት አዲስ ክፍል የይለፍ ቃል ይላኩ፦",
-        'ask_join_details': "የክፍሉን መለያ (ID) እና ፓስወርድ በመሃል ክፍት ቦታ (space) በማድረግ ይላኩ።\nምሳሌ፦ `roomid123 pass123`", 'session_expired': "ጊዜው አልፏል። እባክዎ ፋይሉን እንደገና ይላኩት。"
+        'ask_join_details': "የክፍሉን መለያ (ID) እና ፓስወርድ በመሃል ክፍት ቦታ (space) በማድረግ ይላኩ。\nምሳሌ፦ `roomid123 pass123`", 'session_expired': "ጊዜው አልፏል። እባክዎ ፋይሉን እንደገና ይላኩት。"
     },
     'om': {
         'welcome': "🔐 **Baga Gara Botii Dhoksaa Faayilaa fi Haasaa Sadarkaa Waraanaa Nagayan Dhuftan!**\n\n📁 **FAAYILAAF:** Faayila kamiyyuu erguun bilisaan kiibandii kessaniin dhoksuu fi banuu dandeessu.\n💬 **KUTAA HAASAA (Rooms):** Kutaa haasaa uumuun ykn seenuun iccitidhaan haasa'aa!",
@@ -193,7 +193,7 @@ TEXTS = {
         'ask_room_pass': "Entrez un mot de passe pour le nouveau salon :", 'ask_join_details': "Envoyez l'ID du salon et le mot de passe séparés par un espace.\nExemple: `salonid123 pass123`", 'session_expired': "Session expirée. Renvoyez le fichier."
     },
     'de': {
-        'welcome': "🔐 **Willkommen beim Militär-Verschlüsselungs-Bot!**\n\n📁 **DATEIEN:** Senden Sie eine Datei zum Verชchlüsseln.\n💬 **SICHERE RÄUME:** Erstellen oder betreten Sie einen Raum für komplett geschützte Chats!",
+        'welcome': "🔐 **Willkommen beim Militär-Verschlüsselungs-Bot!**\n\n📁 **DATEIEN:** Senden Sie eine Datei zum Verschlüsseln.\n💬 **SICHERE RÄUME:** Erstellen oder betreten Sie einen Raum für komplett geschützte Chats!",
         'access_denied': "⚠️ **Zugriff verweigert!** Bitte treten Sie Kanal und Gruppe bei:\n1️⃣ {ch}\n2️⃣ {gr}\nDanach /start tippen! 🚀",
         'btn_encrypt': "🔒 Verschlüsseln", 'btn_decrypt': "🔓 Entschlüsseln",
         'btn_create_room': "➕ Raum erstellen", 'btn_join_room': "🔑 Raum beitreten", 'btn_leave_room': "🚪 Raum verlassen",
@@ -241,7 +241,7 @@ TEXTS = {
         'btn_create_room': "➕ Crea Stanza", 'btn_join_room': "🔑 Unisciti alla Stanza", 'btn_leave_room': "🚪 Lascia Stanza",
         'ask_action': "Cosa vorresti fare con questo file?", 'ask_password': "Selezionato: {action}\n\n🔑 Invia una password per il file:",
         'success_enc': "✅ Cifratura completata.", 'success_dec': "✅ Decifratura completata.",
-        'fail_dec': "❌ Password errata.", 'error': "❌ Errore: {e}", 'too_large': "⚠️ File troppo grande (max 19MB).",
+        'fail_dec': "❌ Password errata.", 'error': "❌ Errore: {e}", 'too_large': "⚠️ File too large (max 19MB).",
         'room_created': "✅ **Stanza Creata!**\n🔑 **ID:** `{room_id}`\n🔒 **Password:** `{password}`",
         'room_not_found': "❌ Stanza non trovata.", 'wrong_room_pass': "❌ Password errata.",
         'room_connected': "🔒 Connesso alla stanza sicura! I tuoi messaggi sono protetti.",
@@ -311,7 +311,6 @@ async def force_join_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 # Handlers
 # ---------------------------------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # ልክ በላክኸው ፎቶ መሰረት 12 ቋንቋዎችን በ3 ረድፍ በሚያምር ሁኔታ መደርደር
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton("English 🇬🇧", callback_data="lang_en"),
@@ -397,7 +396,6 @@ async def handle_any_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_bytes = await file.download_as_bytearray()
     raw_data = bytes(file_bytes)
 
-    # ቻት ክፍል ውስጥ ከሆነ ለጓደኛ በራስ-ሰር መቆለፍ እና ማስተላለፍ
     if user_id in user_rooms:
         room_id = user_rooms[user_id]
         password = chat_rooms[room_id]["password"]
@@ -424,7 +422,6 @@ async def handle_any_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     logger.warning(f"Push failed: {e}")
         return
 
-    # ተራ ፋይል ከሆነ
     user_state[user_id] = {
         "file_bytes": raw_data,
         "file_name": file_name,
@@ -524,60 +521,69 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif action == "join":
             parts = text.split()
             if len(parts) < 2:
-                await update.message.reply_text(get_text(user_id, 'ask_join_details'), parse_mode="Markdown")
-                return
-            room_id, password = parts[0], parts[1]
-            if room_id not in chat_rooms:
-                await update.message.reply_text(get_text(user_id, 'room_not_found'))
-                return
-            if chat_rooms[room_id]["password"] != password:
                 await update.message.reply_text(get_text(user_id, 'wrong_room_pass'))
                 return
-            chat_rooms[room_id]["users"].add(user_id)
-            user_rooms[user_id] = room_id
-            await update.message.reply_text(get_text(user_id, 'room_connected'))
+            room_id, password = parts[0], parts[1]
+            if room_id in chat_rooms and chat_rooms[room_id]["password"] == password:
+                chat_rooms[room_id]["users"].add(user_id)
+                user_rooms[user_id] = room_id
+                await update.message.reply_text(get_text(user_id, 'room_connected'))
+            else:
+                await update.message.reply_text(get_text(user_id, 'room_not_found'))
         return
 
-    if state.get("action"):
-        try: await update.message.delete()
+    # ተራ ፋይል የመቆለፍ / የመክፈት ሂደት
+    if state.get("action") == "encrypt":
+        action_type = "encrypt"
+    elif state.get("action") == "decrypt":
+        action_type = "decrypt"
+    else:
+        return
+
+    file_bytes = state["file_bytes"]
+    file_name = state["file_name"]
+    user_state.pop(user_id, None)
+
+    processing_msg = await update.message.reply_text("⚡ Processing file... Please wait.")
+
+    try:
+        if action_type == "encrypt":
+            output_bytes = encrypt_bytes(file_bytes, text)
+            out_name = file_name + ".enc"
+            caption_text = get_text(user_id, 'success_enc')
+        else:
+            output_bytes = decrypt_bytes(file_bytes, text)
+            if file_name.endswith(".enc"):
+                out_name = file_name[:-4]
+            else:
+                out_name = "decrypted_" + file_name
+            caption_text = get_text(user_id, 'success_dec')
+
+        await context.bot.send_document(
+            chat_id=user_id,
+            document=io.BytesIO(output_bytes),
+            filename=out_name,
+            caption=caption_text
+        )
+    except Exception as e:
+        if action_type == "decrypt":
+            await update.message.reply_text(get_text(user_id, 'fail_dec'))
+        else:
+            await update.message.reply_text(get_text(user_id, 'error', e=str(e)))
+    finally:
+        try: await processing_msg.delete()
         except: pass
 
-        action = state["action"]
-        file_bytes = state["file_bytes"]
-        file_name = state["file_name"]
-        user_state.pop(user_id, None)
-
-        try:
-            if action == "encrypt":
-                result = encrypt_bytes(file_bytes, text)
-                out_name = file_name + ".enc"
-            else:
-                result = decrypt_bytes(file_bytes, text)
-                out_name = file_name[:-4] if file_name.endswith(".enc") else file_name + ".dec"
-
-            await update.message.reply_document(
-                document=io.BytesIO(result),
-                filename=out_name,
-                caption=get_text(user_id, f'success_{action[:3]}'),
-            )
-        except Exception as e:
-            logger.exception("Processing failed")
-            if action == "decrypt":
-                await update.message.reply_text(get_text(user_id, 'fail_dec'))
-            else:
-                await update.message.reply_text(get_text(user_id, 'error', e=e))
-
-# ---------------------------------------------------------------------------
-# Main
+# --- Main Application Builder ---
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(handle_button))
     
-    media_filter = filters.Document.ALL | filters.PHOTO | filters.VIDEO
+    media_filter = filters.Document.ALL | filters.PHOTO | filters.VIDEO | filters.AUDIO | filters.VOICE
     app.add_handler(MessageHandler(media_filter, handle_any_file))
-    app.add_handler(filters.TEXT & ~filters.COMMAND, handle_text)
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     logger.info("Bot starting...")
     app.run_polling()
