@@ -569,18 +569,18 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(handle_button))
     
-    media_filter = filters.Document.ALL | filters.PHOTO | filters.VIDEO | filters.AUDIO | filters.VOICE
+    media_filter = filters.Document.ALL | filters.PHOTO | filters.VIDEO
     app.add_handler(MessageHandler(media_filter, handle_any_file))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.add_handler(filters.TEXT & ~filters.COMMAND, handle_text)
 
     logger.info("Bot starting...")
     app.run_polling()
 
 if __name__ == "__main__":
+    main()
