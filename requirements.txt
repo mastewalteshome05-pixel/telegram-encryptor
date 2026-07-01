@@ -1,4 +1,2 @@
-pyTelegramBotAPI
-requests
 python-telegram-bot
 cryptography
