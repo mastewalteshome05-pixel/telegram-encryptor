@@ -304,6 +304,8 @@ async def force_join_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             await update.message.reply_text(msg)
         elif update.callback_query:
             await update.callback_query.answer(text="Please join channel & group first!", show_alert=True)
+            try: await update.callback_query.message.reply_text(msg)
+            except: pass
         return False
     return True
 
@@ -447,7 +449,8 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("lang_"):
         user_lang[user_id] = data.split("_")[1]
         if not await force_join_check(update, context): return
-        await query.message.delete()
+        try: await query.message.delete()
+        except: pass
         await show_welcome_menu(update, user_id)
         return
 
@@ -532,7 +535,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text(get_text(user_id, 'room_not_found'))
         return
 
-    # ተራ ፋይል የመቆለፍ / የመክፈት ሂደት
     if state.get("action") == "encrypt":
         action_type = "encrypt"
     elif state.get("action") == "decrypt":
@@ -583,7 +585,7 @@ def main():
     
     media_filter = filters.Document.ALL | filters.PHOTO | filters.VIDEO | filters.AUDIO | filters.VOICE
     app.add_handler(MessageHandler(media_filter, handle_any_file))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
 
     logger.info("Bot starting...")
     app.run_polling()
